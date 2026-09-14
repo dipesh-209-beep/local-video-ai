@@ -5,5 +5,8 @@ __pycache__/
 *.pyc
 *.mp4
 *.wav
+*.onnx
+*.log
+.DS_Store
 config/*.env
 input/*/diagrams/

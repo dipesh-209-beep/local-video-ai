@@ -30,9 +30,13 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[1]  # repo root (local-video-ai/)
 SCRIPTS_DIR = REPO_ROOT / "scripts"
 TTS_SCRIPT = SCRIPTS_DIR / "tts.py"
-STUDENT_MODEL = "en_US-amy-medium"      # example lighter/higher voice
-TEACHER_MODEL = "en_US-ryan-medium"     # example lower/authoritative voice
 SILENCE_BETWEEN_LINES_SEC = 0.35        # small gap so lines don't run together
+
+from config import load_config
+
+_cfg = load_config()
+STUDENT_MODEL = _cfg["STUDENT_MODEL"]      # example lighter/higher voice
+TEACHER_MODEL = _cfg["TEACHER_MODEL"]     # example lower/authoritative voice
 # -----------------------------------------------------------------------------
 
 
@@ -129,8 +133,8 @@ def main(script_path: str, out_dir: str):
     manifest_path.write_text(json.dumps(manifest, indent=2))
 
     print(f"\nDone.\n  Narration: {final_wav}\n  Manifest:  {manifest_path}")
-    print("\nNext step: run Whisper on the final narration to get word-timed captions, e.g.:")
-    print(f"  whisper {final_wav} --output_dir {out_dir}/output --model base --language en --output_format all")
+    print("\nNext step: transcribe the narration for word-timed captions, e.g.:")
+    print(f"  python3 scripts/transcribe.py {final_wav} --output_dir {out_dir}/captions")
 
 
 if __name__ == "__main__":

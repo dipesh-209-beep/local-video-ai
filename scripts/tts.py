@@ -1,43 +1,71 @@
 import argparse
-import os
 import subprocess
 import sys
 from pathlib import Path
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
+from config import config_path, load_config
+
+cfg = load_config()
+DATA_DIR = Path(cfg["PIPER_DATA_DIR"])
 
 
-def load_env(path: Path) -> None:
-    if not path.exists():
-        return
-    for line in path.read_text().splitlines():
-        line = line.strip()
-        if not line or line.startswith("#") or "=" not in line:
-            continue
-        key, _, value = line.partition("=")
-        os.environ.setdefault(key.strip(), value.strip().strip('"'))
+def die(msg: str) -> None:
+    print(f"tts.py: {msg}", file=sys.stderr)
+    sys.exit(1)
 
 
-load_env(PROJECT_ROOT / "config/tts.env")
+def require_piper():
+    try:
+        subprocess.run(
+            [sys.executable, "-m", "piper", "--help"],
+            capture_output=True, text=True, timeout=30,
+        )
+    except FileNotFoundError:
+        die("piper is not installed — run '.venv/bin/pip install -r requirements.txt'")
+    except subprocess.TimeoutExpired:
+        pass
 
-MODEL = os.environ.get("PIPER_MODEL", "en_US-ryan-medium")
-data_dir = os.environ.get("PIPER_DATA_DIR")
-DATA_DIR = Path(data_dir) if data_dir else PROJECT_ROOT / "models" / "piper"
 
-parser = argparse.ArgumentParser(description="Piper text-to-speech wrapper")
-parser.add_argument("text_file", help="input text file")
-parser.add_argument("output", nargs="?", default="output.wav", help="output wav path")
-parser.add_argument("--model", default=MODEL, help="Piper voice model (overrides config/tts.env)")
-args = parser.parse_args()
+def main():
+    parser = argparse.ArgumentParser(description="Piper text-to-speech wrapper")
+    parser.add_argument("text_file", help="input text file")
+    parser.add_argument("output", nargs="?", default="output.wav", help="output wav path")
+    parser.add_argument("--model", default=cfg["PIPER_MODEL"],
+                        help="Piper voice model (overrides config/app.env)")
+    args = parser.parse_args()
 
-cmd = [
-    "python3", "-m", "piper",
-    "--data-dir", str(DATA_DIR),
-    "-m", args.model,
-    "-i", str(args.text_file),
-    "-f", str(args.output),
-]
+    if not config_path().exists():
+        print("warning: config/app.env not found, using defaults (see config/app.env.example)",
+              file=sys.stderr)
 
-subprocess.run(cmd, check=True)
+    text_file = Path(args.text_file)
+    if not text_file.exists():
+        die(f"text file not found: {text_file}")
 
-print(f"Created: {args.output}")
+    model = Path(args.model) if Path(args.model).suffix else None
+    model_file = model or (DATA_DIR / f"{args.model}.onnx")
+    if not model_file.exists():
+        die(f"voice model not found: {model_file} — run ./setup.sh to download it")
+
+    require_piper()
+
+    cmd = [
+        sys.executable, "-m", "piper",
+        "--data-dir", str(DATA_DIR),
+        "-m", args.model,
+        "-i", str(text_file),
+        "-f", str(args.output),
+    ]
+
+    try:
+        subprocess.run(cmd, check=True)
+    except subprocess.CalledProcessError as e:
+        die(f"piper failed (exit {e.returncode}): {e.stderr.strip() if e.stderr else str(e)}")
+    except FileNotFoundError:
+        die("piper is not installed — run '.venv/bin/pip install -r requirements.txt'")
+
+    print(f"Created: {args.output}")
+
+
+if __name__ == "__main__":
+    main()
