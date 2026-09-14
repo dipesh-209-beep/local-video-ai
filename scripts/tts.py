@@ -1,9 +1,10 @@
+import argparse
 import os
-import sys
 import subprocess
+import sys
 from pathlib import Path
 
-PROJECT_ROOT = Path(__file__).resolve().parent
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 
 def load_env(path: Path) -> None:
@@ -23,21 +24,20 @@ MODEL = os.environ.get("PIPER_MODEL", "en_US-ryan-medium")
 data_dir = os.environ.get("PIPER_DATA_DIR")
 DATA_DIR = Path(data_dir) if data_dir else PROJECT_ROOT / "models" / "piper"
 
-if len(sys.argv) < 2:
-    print("Usage: python3 tts.py script.txt [output.wav]")
-    sys.exit(1)
-
-text_file = Path(sys.argv[1])
-output = Path(sys.argv[2]) if len(sys.argv) > 2 else Path("output.wav")
+parser = argparse.ArgumentParser(description="Piper text-to-speech wrapper")
+parser.add_argument("text_file", help="input text file")
+parser.add_argument("output", nargs="?", default="output.wav", help="output wav path")
+parser.add_argument("--model", default=MODEL, help="Piper voice model (overrides config/tts.env)")
+args = parser.parse_args()
 
 cmd = [
     "python3", "-m", "piper",
     "--data-dir", str(DATA_DIR),
-    "-m", MODEL,
-    "-i", str(text_file),
-    "-f", str(output),
+    "-m", args.model,
+    "-i", str(args.text_file),
+    "-f", str(args.output),
 ]
 
 subprocess.run(cmd, check=True)
 
-print(f"Created: {output}")
+print(f"Created: {args.output}")

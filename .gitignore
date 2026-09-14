@@ -2,5 +2,7 @@
 models/
 output/
 __pycache__/
+*.pyc
 *.mp4
+*.wav
 config/*.env

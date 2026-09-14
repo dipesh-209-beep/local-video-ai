@@ -1,0 +1,59 @@
+{
+"topic": "SHM (Simple Harmonic Motion)",
+"beats": [
+{
+"beat_number": 1,
+"on_screen_caption": "SHM DEFINITION",
+"student_line": "So SHM is just back and forth motion?",
+"teacher_line": "Yes, but acceleration must point toward equilibrium."
+},
+{
+"beat_number": 2,
+"on_screen_caption": "EQUILIBRIUM POSITION",
+"student_line": "Why does everything keep returning to center?",
+"teacher_line": "Because restoring force always pulls toward equilibrium."
+},
+{
+"beat_number": 3,
+"on_screen_caption": "RESTORING FORCE",
+"student_line": "So the force gets stronger farther away?",
+"teacher_line": "Exactly, force is proportional to displacement."
+},
+{
+"beat_number": 4,
+"on_screen_caption": "ACCELERATION",
+"student_line": "Then acceleration must behave the same way?",
+"teacher_line": "Yes, acceleration is opposite and proportional to displacement."
+},
+{
+"beat_number": 5,
+"on_screen_caption": "DISPLACEMENT GRAPH",
+"student_line": "Why does the graph look like a wave?",
+"teacher_line": "Because displacement follows a sine or cosine function."
+},
+{
+"beat_number": 6,
+"on_screen_caption": "VELOCITY",
+"student_line": "Where does the object move fastest?",
+"teacher_line": "At equilibrium, where displacement becomes zero."
+},
+{
+"beat_number": 7,
+"on_screen_caption": "MAXIMUM DISPLACEMENT",
+"student_line": "Then where does velocity become zero?",
+"teacher_line": "At maximum displacement, called the amplitude."
+},
+{
+"beat_number": 8,
+"on_screen_caption": "ENERGY EXCHANGE",
+"student_line": "So energy keeps switching forms constantly?",
+"teacher_line": "Exactly, kinetic and potential energy trade places."
+},
+{
+"beat_number": 9,
+"on_screen_caption": "TIME PERIOD",
+"student_line": "Does amplitude change the time period?",
+"teacher_line": "Not for ideal SHM with constant system parameters."
+}
+]
+}
